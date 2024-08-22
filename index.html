@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bagus M Kusuma</title>
+    <link rel="icon" type="image/jpg" href="./asset/logo.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.13/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13/firebase-firestore-compat.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar">
+        <h1>Bagus M Kusuma</h1>
+        <p style="color: #81c3c0; font-size: 20px">Bachelor of Computer Science</p>
+        <div class="social-icons">
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <section id="about">
+          <h2 class="sectio-title">About Me</h2>
+          <p style="margin-top: 5px; font-style: italic; color: #81c3c0">Data Science / Machine Learning / UI-UX / ISO 9001</p>
+          <p style="color: #dadada">
+            I am a graduate of Informatics Engineering with a strong interest and expertise in data analysis, machine learning, data science, UI/UX, and Android application development. With a deep understanding of these fields, I am
+            committed to creating innovative solutions that are relevant to the current industry landscape. Additionally, I have professional experience as a Quality Engineer at PT Yamaha Indonesia Motor Manufacturing West Java, where I
+            contributed to ensuring superior product quality in compliance with ISO 9001 standards. I am a person of integrity, with a high degree of loyalty, and I excel in adapting to new environments. I am always open to new challenges
+            and opportunities that allow me to continue growing and making a positive impact.
+          </p>
+        </section>
+
+        <hr class="custom-line" />
+
+        <section id="my-projects">
+          <h2 class="sectio-title">My Projects</h2>
+          <div class="projects-container" id="projects-container">
+            <!-- Project cards will be appended here by JavaScript -->
+          </div>
+          <div class="btn">
+            <button id="read-more">Read More</button>
+          </div>
+        </section>
+
+        <hr class="custom-line" />
+
+        <div class="contact-container">
+          <h2>Contact me</h2>
+          <form class="contact-form" id="contact-form">
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" name="name" required />
+            </div>
+            <div class="form-group">
+              <label for="subject">Your Email</label>
+              <input type="email" id="user_email" name="user_email" required />
+            </div>
+            <div class="form-group">
+              <label for="subject">Subject</label>
+              <input type="text" id="subject" name="subject" required />
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit">Send Email</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript for Email Js -->
+    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script type="text/javascript">
+      (function () {
+        emailjs.init("ArmHXo5peGZ_qHePW"); // Ganti dengan User ID dari EmailJS
+      })();
+    </script>
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("contact-form").addEventListener("submit", function (event) {
+          event.preventDefault();
+          emailjs.sendForm("service_hsrh2bb", "template_q4hybbp", this).then(
+            function () {
+              alert("Email sent successfully!");
+            },
+            function (error) {
+              alert("Failed to send email: " + error.text);
+            }
+          );
+        });
+      });
+    </script>
+
+    <!-- Javascript for firebase and project card animation -->
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyC2Ew7uJnyGTJB3sFGxpi1oxJVP1llQxqM",
+        authDomain: "portofolio-bmk.firebaseapp.com",
+        projectId: "portofolio-bmk",
+        storageBucket: "portofolio-bmk.appspot.com",
+        messagingSenderId: "348210057206",
+        appId: "1:348210057206:web:8b24cae3039398d67fc1d7",
+        measurementId: "G-65ZSV9PQ0G",
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // Fetching projects from Firestore
+      db.collection("Projects")
+        .get()
+        .then((querySnapshot) => {
+          const projectsContainer = document.getElementById("projects-container");
+          let projectCount = 0;
+          querySnapshot.forEach((doc) => {
+            console.log(doc.data()); // Log data ke konsol untuk memastikan berhasil diambil
+            const project = doc.data();
+            const projectDiv = document.createElement("div");
+            projectDiv.classList.add("project-card");
+            projectDiv.innerHTML = `
+            <img src="${project.imageUrl}" alt="${project.Judul}" />
+            <h3>${project.Judul}</h3>
+            <p>${project.Deskripsi}</p>
+            <a href="${project.url}" target="_blank"><button class="btn-project">View Project</bbutton></a>
+        `;
+            projectsContainer.appendChild(projectDiv);
+            projectCount++;
+
+            console.log(projectCount);
+            // Hide projects after the third one
+            if (projectCount <= 3) {
+              projectDiv.style.display = "flex";
+              setTimeout(() => {
+                projectDiv.classList.add("show");
+              }, 100); // delay sedikit untuk memicu transisi
+            } else {
+              projectDiv.classList.remove("show");
+              setTimeout(() => (projectDiv.style.display = "none"), 500); // Remove element after animation
+            }
+          });
+
+          const readMoreButton = document.getElementById("read-more");
+          let isExpanded = false;
+
+          readMoreButton.addEventListener("click", () => {
+            const hiddenProjects = document.querySelectorAll(".project-card");
+            hiddenProjects.forEach((project, index) => {
+              if (index >= 3) {
+                if (isExpanded) {
+                  // Hilangkan dengan animasi
+                  project.classList.remove("show");
+                  setTimeout(() => {
+                    project.style.display = "none";
+                  }, 500); // tunggu hingga animasi selesai sebelum mengubah display
+                } else {
+                  // Tampilkan dengan animasi
+                  project.style.display = "flex";
+                  setTimeout(() => {
+                    project.classList.add("show");
+                  }, 100); // delay sedikit untuk memicu transisi
+                }
+              }
+            });
+
+            // Toggle button text
+            readMoreButton.textContent = isExpanded ? "Read More" : "Show Less";
+            isExpanded = !isExpanded;
+          });
+        })
+        .catch((error) => {
+          console.error("Error getting documents: ", error);
+        });
+    </script>
+  </body>
+</html>
